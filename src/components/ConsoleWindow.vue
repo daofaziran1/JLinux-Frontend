@@ -1,27 +1,51 @@
 <template>
-  <div>
-    <ul>
-        <li style="float:left"><a class="active" href="#about">{{info}}</a></li>
-        <li><a href="#contact">×</a></li>
-        <li><a href="#news">口</a></li>
-        <li><a href="#home">-</a></li>
+  <div class ="console" v-show="isShow">
+    <ul class="menu">
+        <li class="consoleNum"><span class="num">{{info}}</span></li>
+        <div class="tabs">
+            <li class="tab" @click="changeShow"><span>一</span></li>
+            <li class="tab" @click="close"><span>X</span></li>
+
+        </div>
     </ul>
+    <Term></Term>
   </div>
 </template>
-
 <script>
+import Term from "./Term.vue"
     export default {
         name:'ConsoleWindow',
         data() {
             return {
-                info:"console-1"
+                info:"console-1",
+                isShow:true
             }
+        },
+        methods:{
+            changeShow(){
+                this.isShow = !this.isShow
+            },
+            close(){
+                // 销毁这个控制台的使用，使用生命周期钩子销毁函数，但有bug
+
+                this.destroy()
+            }
+        },
+        components:{Term},
+        beforeDestroy(){
+            // 关闭一些功能
+            this.changeShow()
         }
     }
 </script>
 
 <style>
-    ul {
+    .console{
+        height: 50%;
+        width: 80%;
+    }
+
+    .menu{
         list-style-type: none;
         margin: 0;
         padding: 0;
@@ -29,11 +53,28 @@
         background-color: #333;
     }
 
-    li {
+    .consoleNum{
+        float: left;  
+        background-color: rgb(86, 167, 93);  
+        margin-right:5px;  
+    }
+    .num{
+        display: block;
+        color: white;
+        text-align: center;
+        padding: 8px 14px;
+
+        text-decoration: none;
+    }
+    .tabs{
         float: right;
     }
 
-    li a {
+    .tab{
+        float: left;
+    }
+
+    li span {
         display: block;
         color: white;
         text-align: center;
@@ -41,11 +82,7 @@
         text-decoration: none;
     }
 
-    li a:hover:not(.active) {
-        background-color: #111;
-    }
-
-    .active {
-        background-color: #4CAF50;
+    li span:hover:not(.active) {
+        background-color: #758676;
     }
 </style>

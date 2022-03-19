@@ -42,7 +42,7 @@ import Vue from 'vue';
           //   token: res.data.token,
           // };
           // xterm 进行渲染交互,ref属性绑定到相对应的dom上
-          this.term.open(this.$refs.console);
+          // this.term.open(this.$refs.console);
           this.term.write(this.strHandle(this.data.user,this.data.path));
           // 自适应屏幕大小
           this.fitAddon.fit();
@@ -53,15 +53,16 @@ import Vue from 'vue';
         var cmd = ""
         // 监听键盘输入事件
         this.term.onKey((e) => {
+                              console.log(e)
         /*
                   esc = 27
                   回车 = 13
                   上下左右 = 37,38,39,40
+                  backspace = 8
         */
-        console.log(cmd);
         let code = e.domEvent.which;
         if (code === 13) {
-          this.term.write(e.key + "\n");
+          this.term.write(e.key + "\n")
           axios
             .post("api/exec", {
               token: this.data.token,
@@ -69,25 +70,27 @@ import Vue from 'vue';
               time: new Date().getMilliseconds(),
             })
             .then((res) => {
-              let command = cmd.split(" ")[0];
+              let command = cmd.split(" ")[0]
               if (command === "pwd") {
-                this.term.write(this.strHandle(res.data.msg));
+                this.term.write(this.strHandle(res.data.msg))
               } else if (command === "ls") {
                 res.data.files.forEach((item) => {
-                  this.term.write(this.strHandle(item));
+                  this.term.write(this.strHandle(item))
                 });
               } else if (command === "cd") {
-                Vue.set(this.data.path,"path",res.data.path);
+                Vue.set(this.data.path,"path",res.data.path)
               }
               cmd = "";
-              this.term.write(this.strHandle(this.data.user,this.data.path));
+              this.term.write(this.strHandle(this.data.user,this.data.path))
             });
         } else if (code === 8) {
-          this.term.write("\b \b");
-          cmd = cmd.substring(0, cmd.length - 1);
+            if(cmd.length !== 0){
+              this.term.write("\b \b")
+              cmd = cmd.substring(0, cmd.length - 1)
+            }
         } else {
-          cmd = cmd + e.key;
-          this.term.write(e.key);
+          cmd = cmd + e.key
+          this.term.write(e.key)
         }
       });
       }
@@ -109,12 +112,14 @@ import Vue from 'vue';
               lineHeight: 16,
             },
       });
-      this.fitAddon = new FitAddon();
-      this.term.loadAddon(this.fitAddon);
+      this.fitAddon = new FitAddon()
+      this.term.loadAddon(this.fitAddon)
+
     },
     mounted() {
-          this.login()
-          this.exec()
+      this.term.open(this.$refs.console);
+      this.login()
+      this.exec()
     }
   }
 </script>
