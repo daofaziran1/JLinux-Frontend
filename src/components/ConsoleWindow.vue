@@ -27,8 +27,7 @@ import Term from "./Term.vue"
             },
             close(){
                 // 销毁这个控制台的使用，使用生命周期钩子销毁函数，但有bug
-
-                this.destroy()
+                this.$destroy()
             }
         },
         components:{Term},

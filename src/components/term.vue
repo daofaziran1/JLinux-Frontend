@@ -114,7 +114,6 @@ import Vue from 'vue';
       });
       this.fitAddon = new FitAddon()
       this.term.loadAddon(this.fitAddon)
-
     },
     mounted() {
       this.term.open(this.$refs.console);

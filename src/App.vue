@@ -1,13 +1,19 @@
 <template>
   <div>
-    <ConsoleWindow></ConsoleWindow>
+    <!-- <ConsoleWindow></ConsoleWindow> -->
+    <!-- <Desktop></Desktop> -->
+    <Login></Login>
   </div>
 </template>
 <script>
 // import Term from "./components/Term"
 import ConsoleWindow from './components/ConsoleWindow';
+import Desktop from './components/Desktop'
+import Login from './components/Login'
 export default {
   name:"App",
-  components:{ConsoleWindow}
+  components:{ConsoleWindow,Desktop,Login}
 };
-</script>s
+</script>
+<style scoped>
+</style>
