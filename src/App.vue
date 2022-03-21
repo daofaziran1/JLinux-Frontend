@@ -2,7 +2,10 @@
   <div>
     <!-- <ConsoleWindow></ConsoleWindow> -->
     <!-- <Desktop></Desktop> -->
-    <Login></Login>
+    <router-view>      
+    </router-view>
+    <!-- <DeskTest></DeskTest> -->
+    <!-- <Software></Software> -->
   </div>
 </template>
 <script>
@@ -10,10 +13,12 @@
 import ConsoleWindow from './components/ConsoleWindow';
 import Desktop from './components/Desktop'
 import Login from './components/Login'
-export default {
-  name:"App",
-  components:{ConsoleWindow,Desktop,Login}
-};
+import DeskTest from './components/DeskTest.vue'
+import Software from './components/Software.vue';
+  export default {
+    name:"App",
+    components:{ConsoleWindow,Desktop,Login,DeskTest, Software},
+  };
 </script>
 <style scoped>
 </style>

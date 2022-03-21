@@ -45,7 +45,7 @@ import Vue from 'vue';
           // this.term.open(this.$refs.console);
           this.term.write(this.strHandle(this.data.user,this.data.path));
           // 自适应屏幕大小
-          this.fitAddon.fit();
+          // this.fitAddon.fit();
         })
       },
       exec() {

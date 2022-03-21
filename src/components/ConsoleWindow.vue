@@ -5,7 +5,6 @@
         <div class="tabs">
             <li class="tab" @click="changeShow"><span>一</span></li>
             <li class="tab" @click="close"><span>X</span></li>
-
         </div>
     </ul>
     <Term></Term>
@@ -17,17 +16,30 @@ import Term from "./Term.vue"
         name:'ConsoleWindow',
         data() {
             return {
+                /*
+                1、isShow 与 tabHidden 同时为true时，tab栏里面的按钮加深，且展示，
+                2、isShow 为false，tabHidden为true时，tab栏里面按钮不加深，且不展示
+                3、当两个都false时，tab栏消失，且不展示
+                */  
                 info:"console-1",
-                isShow:true
+                // isShow:this.$store.state.termShow,
+                tabShow:this.$store.state.tabShow
+            }
+        },
+        computed :{
+            isShow() {
+                return this.$store.state.termShow
             }
         },
         methods:{
             changeShow(){
-                this.isShow = !this.isShow
+                this.$store.commit('changeTermShow')
             },
             close(){
+                this.changeShow()
+                this.$store.commit('changeTabShow')
                 // 销毁这个控制台的使用，使用生命周期钩子销毁函数，但有bug
-                this.$destroy()
+                // this.$destroy()
             }
         },
         components:{Term},
@@ -40,8 +52,8 @@ import Term from "./Term.vue"
 
 <style>
     .console{
-        height: 50%;
-        width: 80%;
+        height: 200px;
+        width: 50%;
     }
 
     .menu{
