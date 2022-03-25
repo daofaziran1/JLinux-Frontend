@@ -2,8 +2,9 @@
   <div>
     <!-- <ConsoleWindow></ConsoleWindow> -->
     <!-- <Desktop></Desktop> -->
-    <router-view>      
-    </router-view>
+    <!-- <router-view>      
+    </router-view> -->
+    <TT></TT>
     <!-- <DeskTest></DeskTest> -->
     <!-- <Software></Software> -->
   </div>
@@ -15,9 +16,10 @@ import Desktop from './components/Desktop'
 import Login from './components/Login'
 import DeskTest from './components/DeskTest.vue'
 import Software from './components/Software.vue';
+import TT from './components/TT.vue'
   export default {
     name:"App",
-    components:{ConsoleWindow,Desktop,Login,DeskTest, Software},
+    components:{ConsoleWindow,Desktop,Login,DeskTest, Software,TT},
   };
 </script>
 <style scoped>

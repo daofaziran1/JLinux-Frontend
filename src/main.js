@@ -6,7 +6,7 @@ import VueRouter from 'vue-router';
 import router from './router'
 import store from './store'
 import App from './App.vue'
-
+require("./mock")
 Vue.use(VueRouter)
 Vue.use(ElementUI);
 Vue.config.productionTip = false
