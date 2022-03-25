@@ -7,8 +7,6 @@
             <el-container>
                 <el-aside :width="asideWidth">
                   <Software></Software>
-                  <Software></Software>
-                  <Software></Software>
                 </el-aside>
                 <el-container>
                     <el-main>
@@ -36,7 +34,7 @@ import Tab from '../components/Tab.vue'
             timer:null,
             headerHeight:window.innerHeight*0.04+'px',
             asideWidth:window.innerWidth*0.05+'px',
-            footerHeight:window.innerHeight*0.06+'px'
+            footerHeight:window.innerHeight*0.06+'px',
           }
         },
         computed: {
@@ -55,6 +53,8 @@ import Tab from '../components/Tab.vue'
           // console.log('浏览器可用高宽 '+window.innerHeight+" "+ window.innerWidth)
           // console.log('body宽高 '+body.offsetHeight+" "+body.offsetWidth);
           // console.log('body宽高 '+body.clientHeight+" "+body.clientWidth);
+        },
+        methods:{
         },
         mounted() {
           // 开启一个定时器，使页面的时间能够实时变化

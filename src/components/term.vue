@@ -1,5 +1,5 @@
 <template>
-  <div ref="console"></div>
+  <div ref="console" class="term"></div>
 </template>
 
 <script>
@@ -45,7 +45,7 @@ import Vue from 'vue';
           // this.term.open(this.$refs.console);
           this.term.write(this.strHandle(this.data.user,this.data.path));
           // 自适应屏幕大小
-          // this.fitAddon.fit();
+          this.fitAddon.fit();
         })
       },
       exec() {
@@ -98,7 +98,7 @@ import Vue from 'vue';
     created() {
       this.term = new Terminal({
             rendererType: "canvas", //渲染类型
-            rows: 100, //行数
+            rows: 28, //行数
             // cols: parseInt(_this.cols), // 不指定行数，自动回车后光标从下一行开始
             convertEol: true, //启用时，光标将设置为下一行的开头
             //   scrollback: 50, //终端中的回滚量
@@ -124,5 +124,4 @@ import Vue from 'vue';
 </script>
 
 <style>
-
 </style>

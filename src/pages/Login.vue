@@ -26,7 +26,6 @@
 </template>
 
 <script>
-import DeskTest from './DeskTest.vue'
     export default {
         name:'Login',
         data() {
@@ -72,17 +71,21 @@ import DeskTest from './DeskTest.vue'
         mounted() {
             // 先判断本地缓存里是否有用户信息，若有，则直接绑定到用户密码上。
             if(localStorage.length !=0){
-                for(v in localStorage.key){
-                    if(v === 'userInfo'){
-                        this.form = JSON.parse(localStorage.getItem('userInfo'))
-                    }
+                if(localStorage.getItem('userInfo') != null){
+                    this.form = JSON.parse(localStorage.getItem('userInfo'))
+                }else {
+                    this.form = {
+                            account: '',
+                            password: '',
+                            record: false,
+                    }                    
                 }
             }else {
                 this.form = {
                             account: '',
                             password: '',
                             record: false,
-                    }
+                }
             }
         }
     }

@@ -1,17 +1,19 @@
 <template>
-  <div class ="console" v-show="isShow">
-    <ul class="menu">
-        <li class="consoleNum"><span class="num">{{info}}</span></li>
-        <div class="tabs">
-            <li class="tab" @click="changeShow"><span>一</span></li>
-            <li class="tab" @click="close"><span>X</span></li>
+  <div class ="console" v-show="isShow" >
+    <div class="menu" @mousedown="move">
+        <div class="consoleNum">
+            <span class="num">{{info}}</span>
         </div>
-    </ul>
+        <div class="tabs">
+            <span class="tab" @click="changeShow">一</span>
+            <span class="tab"  @click="close">X</span>
+        </div>
+    </div>
     <Term></Term>
   </div>
 </template>
 <script>
-import Term from "./Term.vue"
+import Term from "./Term"
     export default {
         name:'ConsoleWindow',
         data() {
@@ -23,7 +25,9 @@ import Term from "./Term.vue"
                 */  
                 info:"console-1",
                 // isShow:this.$store.state.termShow,
-                tabShow:this.$store.state.tabShow
+                tabShow:this.$store.state.tabShow,
+                posX:0,
+                posY:0
             }
         },
         computed :{
@@ -40,7 +44,35 @@ import Term from "./Term.vue"
                 this.$store.commit('changeTabShow')
                 // 销毁这个控制台的使用，使用生命周期钩子销毁函数，但有bug
                 // this.$destroy()
-            }
+            },
+            move(e){
+                let odiv = e.target;        //获取目标元素
+                let odivPre = e.target.parentElement                // 找到父元素
+                console.log(e.target === e.currentTarget);
+                // 找到父元素
+                console.log(e.target.parentElement)
+                //算出鼠标相对元素的位置
+                let disX = e.clientX - odiv.offsetLeft;
+                let disY = e.clientY - odiv.offsetTop;
+
+                document.onmousemove = (e)=>{       //鼠标按下并移动的事件
+                    //用鼠标的位置减去鼠标相对元素的位置，得到元素的位置
+                    let left = e.clientX - disX;    
+                    let top = e.clientY - disY;
+                    
+                    //绑定元素位置到posX和posY上面
+                    this.posX = top;
+                    this.posY = left;
+                    
+                    //移动当前元素
+                    odivPre.style.left = left + 'px';
+                    odivPre.style.top = top + 'px';
+                };
+                document.onmouseup = (e) => {
+                    document.onmousemove = null;
+                    document.onmouseup = null;
+                };
+            }    
         },
         components:{Term},
         beforeDestroy(){
@@ -52,8 +84,11 @@ import Term from "./Term.vue"
 
 <style>
     .console{
-        height: 200px;
-        width: 50%;
+        height: 45.6rem;
+        width: 49.6%;
+        opacity: 0.8;
+        background-color: rgb(38, 57, 73);
+        position: relative;
     }
 
     .menu{
@@ -62,6 +97,7 @@ import Term from "./Term.vue"
         padding: 0;
         overflow: hidden;
         background-color: #333;
+        position: relative;
     }
 
     .consoleNum{
@@ -74,7 +110,6 @@ import Term from "./Term.vue"
         color: white;
         text-align: center;
         padding: 8px 14px;
-
         text-decoration: none;
     }
     .tabs{
@@ -83,17 +118,13 @@ import Term from "./Term.vue"
 
     .tab{
         float: left;
-    }
-
-    li span {
         display: block;
         color: white;
         text-align: center;
         padding: 8px 14px;
         text-decoration: none;
     }
-
-    li span:hover:not(.active) {
-        background-color: #758676;
+    .tab:hover:not(.active){
+        background-color: #848b84;
     }
 </style>
