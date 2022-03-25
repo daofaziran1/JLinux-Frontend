@@ -2,24 +2,18 @@
   <div>
     <!-- <ConsoleWindow></ConsoleWindow> -->
     <!-- <Desktop></Desktop> -->
-    <!-- <router-view>      
-    </router-view> -->
-    <TT></TT>
+    <router-view>      
+    </router-view>
     <!-- <DeskTest></DeskTest> -->
     <!-- <Software></Software> -->
   </div>
 </template>
 <script>
-// import Term from "./components/Term"
-import ConsoleWindow from './components/ConsoleWindow';
-import Desktop from './components/Desktop'
-import Login from './components/Login'
-import DeskTest from './components/DeskTest.vue'
-import Software from './components/Software.vue';
-import TT from './components/TT.vue'
+import Login from './pages/Login'
+import DeskTest from './pages/DeskTest'
   export default {
     name:"App",
-    components:{ConsoleWindow,Desktop,Login,DeskTest, Software,TT},
+    components:{Login,DeskTest},
   };
 </script>
 <style scoped>

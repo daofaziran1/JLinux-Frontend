@@ -1,6 +1,6 @@
 import VueRouter  from "vue-router";
-import DeskTest from '../components/DeskTest'
-import Login from  '../components/Login'
+import DeskTest from '../pages/DeskTest'
+import Login from  '../pages/Login'
 export default new VueRouter({
     routes: [
         {

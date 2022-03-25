@@ -25,9 +25,9 @@
 
 <script>
 import dayjs from "dayjs"
-import Software from './Software.vue'
-import ConsoleWindow from './ConsoleWindow'
-import Tab from './Tab.vue'
+import Software from '../components/Software.vue'
+import ConsoleWindow from '../components/ConsoleWindow.vue'
+import Tab from '../components/Tab.vue'
     export default {
         name:'DeskTest',
         data(){
