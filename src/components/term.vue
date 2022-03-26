@@ -1,67 +1,126 @@
 <template>
-  <div>
-    <v-shell
-      :banner="banner"
-      :shell_input="send_to_terminal"
-      :commands="commands"
-      @shell_output="prompt"
-    ></v-shell>
-  </div>
+  <div ref="console" class="term"></div>
 </template>
 
 <script>
-import shell from 'vue-shell'
-export default {
-	name:'term',
-	data() {
-		return {
-		  send_to_terminal: "",
-		  login: {
-			  account:'',
-			  password:''
-		  },
-		  banner: {
-			// header: "Vue Shell",
-			// subHeader: "Shell is power just enjoy 🔥",
-			// helpHeader: 'Enter "help" for more information.',
-			currentInfo: {
-				// time: 0,
-				user:'root@',
-				localHost:'localhost'
-			},
-			currentDir: "pwd:~$",
-			// img: {
-			// 	align: "left",
-			// 	link: "/mylogo.png",
-			// 	width: 100,
-			// 	height: 100
-			// }
-		  },
-		  commands: [
-			{ name: "info",
-			  desc: "Show information about this terminal",
-			  get() {
-				return `<p>info指令</p>`;
-			}
-			},
-			{
-			  name: "uname",
-			  desc: "Show the current terminal name",
-			  get() {
-				return navigator.appVersion;
-			  }
-			}
-		  ]
-		};
-	  },
-	  methods: {
-		prompt(value) {
-		  if (value == "node -v") {
-			this.send_to_terminal = process.versions.node;
-		  }
-		}
-	  }
-	};
+import { Terminal } from 'xterm';
+import { FitAddon } from 'xterm-addon-fit';
+import { AttachAddon } from 'xterm-addon-attach'
+import "xterm/css/xterm.css";
+import axios from 'axios';
+import Vue from 'vue';
+	export default {
+    name:"Term",
+    data() {
+      return {
+        data: {
+          user: "",
+          path: "",
+          token: "",
+        },
+        term:Object,
+        fitAddon:Object
+      };
+    },
+    methods:{
+      //处理字符的输入，如控制台常有的roo@path:$
+      strHandle() {
+          return arguments.length == 2 ? arguments[0] + '@' + arguments[1] + ':$ ' : arguments[0] + '\n'
+      },
+      login() {
+        axios.post("api/login", {
+          username: "root",
+          password: "123456",
+        }).then((res) => {
+          //  获取后台数据
+          this.data.user = "root",
+          this.data.path = res.data.path,
+          this.data.token =  res.data.token
+          // this.data = {
+          //   user: "root",
+          //   path: res.data.path,
+          //   token: res.data.token,
+          // };
+          // xterm 进行渲染交互,ref属性绑定到相对应的dom上
+          // this.term.open(this.$refs.console);
+          this.term.write(this.strHandle(this.data.user,this.data.path));
+          // 自适应屏幕大小
+          this.fitAddon.fit();
+        })
+      },
+      exec() {
+        // 记录命令
+        var cmd = ""
+        // 监听键盘输入事件
+        this.term.onKey((e) => {
+                              console.log(e)
+        /*
+                  esc = 27
+                  回车 = 13
+                  上下左右 = 37,38,39,40
+                  backspace = 8
+        */
+        let code = e.domEvent.which;
+        if (code === 13) {
+          this.term.write(e.key + "\n")
+          axios
+            .post("api/exec", {
+              token: this.data.token,
+              command: cmd,
+              time: new Date().getMilliseconds(),
+            })
+            .then((res) => {
+              let command = cmd.split(" ")[0]
+              if (command === "pwd") {
+                this.term.write(this.strHandle(res.data.msg))
+              } else if (command === "ls") {
+                res.data.files.forEach((item) => {
+                  this.term.write(this.strHandle(item))
+                });
+              } else if (command === "cd") {
+                Vue.set(this.data.path,"path",res.data.path)
+              }
+              cmd = "";
+              this.term.write(this.strHandle(this.data.user,this.data.path))
+            });
+        } else if (code === 8) {
+            if(cmd.length !== 0){
+              this.term.write("\b \b")
+              cmd = cmd.substring(0, cmd.length - 1)
+            }
+        } else {
+          cmd = cmd + e.key
+          this.term.write(e.key)
+        }
+      });
+      }
+    },
+    created() {
+      this.term = new Terminal({
+            rendererType: "canvas", //渲染类型
+            rows: 28, //行数
+            // cols: parseInt(_this.cols), // 不指定行数，自动回车后光标从下一行开始
+            convertEol: true, //启用时，光标将设置为下一行的开头
+            //   scrollback: 50, //终端中的回滚量
+            disableStdin: false, //是否应禁用输入。
+            cursorStyle: "underline", //光标样式
+            cursorBlink: true, //光标闪烁
+            theme: {
+              foreground: "#7e9192", //字体
+              background: "#002833", //背景色
+              cursor: "help", //设置光标
+              lineHeight: 16,
+            },
+      });
+      this.fitAddon = new FitAddon()
+      this.term.loadAddon(this.fitAddon)
+    },
+    mounted() {
+      this.term.open(this.$refs.console);
+      this.login()
+      this.exec()
+    }
+  }
 </script>
 
 <style>

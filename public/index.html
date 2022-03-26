@@ -6,6 +6,19 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title>default</title>
+    <style>
+      /* 占满整个屏幕，但不出现滚动条 */
+        body,html{
+            height: 100%;
+            width:100%;
+            margin:0 0 0 0;
+            padding: 0px;
+            overflow:hidden hidden;
+        }
+        body{
+          background-image: url("../src/assets/desktop.png");
+        }
+    </style>
   </head>
   <body>
     <noscript>
@@ -14,4 +27,5 @@
     <div id="app"></div>
     <!-- built files will be auto injected -->
   </body>
+
 </html>
