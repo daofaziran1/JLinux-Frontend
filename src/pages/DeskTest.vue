@@ -1,20 +1,35 @@
 <template>
-    <div id="deskBasic">
+    <div id="deskBasic" ref="bg" :style="{backgroundImage : 'url(' + bgImg + ')',backgroundRepeat: 'no-repeat',
+backgroundSize:['100%','100%']}">
         <el-container>
             <el-header :height="headerHeight">
+                <span style="float:left;">活动</span>
                 <span>{{dateTime}}</span>
+                <span class="mouse"  @click="dialogVisible = true" circle><i class="el-icon-edit"></i></span>
             </el-header>
             <el-container>
                 <el-aside :width="asideWidth">
-                  <Software></Software>
+                  <Software @dblclick.native="createTermView"></Software>
+                  <FileSoft @dblclick.native="openFile"></FileSoft>
                 </el-aside>
                 <el-container>
-                    <el-main>
-                      <ConsoleWindow/>
+                    <el-main ref="main" id="test">
+                      <File v-if="fileShow"></File>
+                      <!-- <test-term></test-term> -->
+                      <!-- <console-window></console-window>     -->
+                      <el-dialog
+                            ref="end"
+                            title="主题"
+                            :visible.sync="dialogVisible"
+                            width="30%"
+                            :modal="false"
+                            class="theme">
+                            <Theme  @getTheme="getImg"></Theme>
+                      </el-dialog>
                     </el-main>
-                    <el-footer :height="footerHeight">
+                    <!-- <el-footer :height="footerHeight">
                         <Tab></Tab> 
-                    </el-footer>
+                    </el-footer> -->
                 </el-container>
             </el-container>
         </el-container>
@@ -26,6 +41,12 @@ import dayjs from "dayjs"
 import Software from '../components/Software.vue'
 import ConsoleWindow from '../components/ConsoleWindow.vue'
 import Tab from '../components/Tab.vue'
+import Theme from '../components/Theme.vue'
+import store from '../store'
+import Vue from 'vue'
+import FileSoft from '../components/FileSoft.vue'
+import File from '../components/File.vue'
+import TestTerm from '../components/TestTerm.vue'
     export default {
         name:'DeskTest',
         data(){
@@ -35,18 +56,25 @@ import Tab from '../components/Tab.vue'
             headerHeight:window.innerHeight*0.04+'px',
             asideWidth:window.innerWidth*0.05+'px',
             footerHeight:window.innerHeight*0.06+'px',
+            dialogVisible: false,
+            bgImg:require('../assets/desktop.png'),
+            fileShow:false,
+            
+            zIndexMax:1  //  设置一个图层属性，最低是1
           }
         },
-        computed: {
-            termShow() {
-                return Vue.state.termShow
-            },
-            tabShow() {
-                return Vue.state.tabShow
-            }
-        },
-        components:{Software,ConsoleWindow,Tab},
+        // computed: {
+        //     termShow() {
+        //         return Vue.state.termShow
+        //     },
+        //     tabShow() {
+        //         return Vue.state.tabShow
+        //     }
+        // },
+        components:{Software,ConsoleWindow,Tab,Theme,FileSoft, File, TestTerm},
         created() {
+          
+          
           // console.log('屏幕可用高宽 '+screen.availHeight+' '+ screen.availWidth);
           // console.log('屏幕高宽 '+screen.Height+' '+ screen.Width);
           // console.log('浏览器高宽 '+window.outerHeight+" "+ window.outerWidth)
@@ -55,13 +83,80 @@ import Tab from '../components/Tab.vue'
           // console.log('body宽高 '+body.clientHeight+" "+body.clientWidth);
         },
         methods:{
+          getImg(value){
+            
+            // 更改背景图片
+            this.bgImg = value
+            // this.$refs.bg.style.backgroundImage = value
+            // console.log(this.$refs.bg.style)
+            
+            // console.log(value)
+          },
+          createTermView(){
+            // console.log("创建了一个term终端")
+            // this.$refs.main.$el.innerHTML('<ConsoleWindow/>');
+            // let term = "<ConsoleWindow/>"
+            // for (const iterator of this.$refs.main.$el.children) {
+            //   console.log(iterator);
+            // }
+            // 获取到当前的main下的所有div的数量
+            let childrenCount = this.$refs.main.$el.children.length
+            // 创建要挂载的div视图
+            let term= document.createElement("div")
+            term.id = 'terminal'
+            // 插入到相对应的位置
+            this.$refs.main.$el.insertBefore(term,this.$refs.end.$el)
+            
+            // Vue.component('console-window',)
+            // console.log(this.$refs.main.$el.location);
+            // document.getElementById("test").innerHTML(term)
+            // this.$refs.main.innerHTML('<ConsoleWindow/>')
+            // 创建一个组件实例，并挂载到对应的视图上
+            var tt = Vue.extend(TestTerm)
+            new tt().$mount('#terminal')
+            
+            // 配置多窗口的位置和图层问题
+            let termCount = childrenCount - 1 
+            let terms = this.$refs.main.$el.children
+            let thisConsole = terms[termCount]
+
+            thisConsole.style.zIndex = this.zIndexMax > childrenCount ? this.zIndexMax + 1 : childrenCount
+            this.zIndexMax = parseInt(thisConsole.style.zIndex)
+            console.log()
+            // this.$refs.main.$el.children[heightIndex-1].style.zIndex = heightIndex + 1
+            // this.$refs.main.$el.children[heightIndex-1].style.left = (280 + (heightIndex-1) * 76.58)+'px'
+            // this.$refs.main.$el.children[heightIndex-1].style.top= (49 + (heightIndex-1) * 32)+'px'
+            
+            thisConsole.style.left = (280 + (termCount) * 76.58)+'px'
+            thisConsole.style.top= (49 + (termCount) * 32)+'px'
+            // 绑定点击事件
+
+            thisConsole.onclick = e => {
+              
+              let currentZIndex = parseInt(thisConsole.style.zIndex)
+              // console.log("点击前当前最高层："+this.zIndexMax);
+              if(currentZIndex != this.zIndexMax){
+                thisConsole.style.zIndex = this.zIndexMax + 1
+                this.zIndexMax++
+              }
+            }
+            // console.log("创建完毕")
+            // 设置图层
+          },
+          openFile(){
+            this.fileShow = !this.fileShow
+          }
         },
         mounted() {
           // 开启一个定时器，使页面的时间能够实时变化
           this.timer = setInterval(() => {
               this.dateTime = dayjs().format("YYYY年MM月DD日 dddd HH:mm:ss")
           },144)
+          
         },
+        updated(){
+            
+        }, 
         beforeDestroy() {
             //  销毁前关闭定时器
             clearInterval(this.timer)
@@ -73,7 +168,7 @@ import Tab from '../components/Tab.vue'
   #deskBasic{
     height: 722px;
     width:1536px;
-    background-image: url('../assets/desktop.png');
+    /* background-image: url('../assets/desktop.png'); */
   }
   .el-container{
     padding: 0px;
@@ -85,10 +180,12 @@ import Tab from '../components/Tab.vue'
     background-color: #232425;
     color: rgb(233, 224, 224);
     text-align: center;
-    height: 1%;
+    height: 1.5%;
     opacity: 0.4;
     border-radius:5px;
-
+    display: flex;
+    justify-content:space-between;
+    align-items: center;
   } 
   .el-footer {
     background-color: #242629;
@@ -105,13 +202,12 @@ import Tab from '../components/Tab.vue'
   }
   
   .el-aside {
-    background-color: #3c3d3f;
+    background-color: #373738;
     color: #333;
     text-align: center;
-    opacity: 0.9;
+    opacity: 0.75;
     border-radius:5px;
   }
-  
   .el-main {
     /* color: #333; */
     display: flex;
@@ -120,5 +216,15 @@ import Tab from '../components/Tab.vue'
     text-align: center;
     align-items: center;
   }
-  
+  span{
+    font-size: larger;
+  }
+  .mouse{
+
+    /* background-color: aqua; */
+    width: 40px;
+  }
+  .mouse:hover{
+    background-color: #333;
+  }
 </style>

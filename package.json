@@ -11,6 +11,7 @@
     "core-js": "^2.6.5",
     "dayjs": "^1.11.0",
     "element-ui": "^2.15.6",
+    "mockjs": "^1.1.0",
     "sass-loader": "^12.6.0",
     "vue": "^2.6.10",
     "vue-command": "^23.0.1",
