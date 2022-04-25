@@ -1,6 +1,6 @@
 <template>
     <div class="basic">
-        <div v-for="theme in themeColor" key="index" class="theme" @click="bubbling">
+        <div v-for="(theme,index) in themeColor" :key="index" class="theme" @click="bubbling">
             <el-image
                 :src="require('../assets/'+theme.url)"
                 fit="fill">

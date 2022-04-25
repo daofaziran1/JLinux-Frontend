@@ -241,7 +241,6 @@ import Vue from 'vue';
     methods:{
       //处理字符的输入，如控制台常有的root@path:$
       strHandle() {
-        
           return arguments.length == 2 ? arguments[0] + '@' + arguments[1] + ':$ ' : arguments[0] + '\n'
       },
       login() {
@@ -278,10 +277,11 @@ import Vue from 'vue';
         if (code === 13) {
           this.term.write(this.strHandle(e.key))
           //  去除左方空格
-          cmd = cmd.replace(/^\s\s*/, '')
           this.cmdStorage.push(cmd)
           let cmds = cmd.split(' ')
-          if(cmds[0] == 'help'){
+          if(cmds[0] == ''){
+            this.term.write(this.strHandle(this.textColor.brightWhite+this.userInfo.user,this.userInfo.path))
+          }else if(cmds[0] == 'help'){
               // help 无其他参数，格式 help
               if(cmds.length === 1){
                 this.commandList.forEach(
@@ -338,10 +338,10 @@ import Vue from 'vue';
                         if(all || cmds[1] == '-s'){
                           this.term.writeln(this.textColor.yellow+res.cmd+"指令格式："+res.format)
                         }
-                        if(all){
+                        if(all || cmds[1] == '-p'){
                           res.params.forEach( 
                             param =>{
-                              this.term.writeln("   "+param)
+                              this.term.writeln(this.textColor.yellow+"   "+param)
                           })
                         }
                       }
@@ -439,7 +439,7 @@ import Vue from 'vue';
                 }
               )
           }
-          this.storageIndex = this.cmdStorage.length - 1
+          this.storageIndex = this.cmdStorage.length
         } else if (code === 8) {
             if(cmd.length !== 0){
               this.term.write("\b \b")
@@ -468,29 +468,60 @@ import Vue from 'vue';
           cmd = "";
           this.term.write(this.strHandle(this.textColor.brightWhite+this.userInfo.user,this.userInfo.path))
         }else if(code === 38){
+
           // 箭头向上代表上一个命令
           if(cmd != ''){
             let len = cmd.length
-            var backspace
             for(var i=0;i<len;++i){
               this.term.write("\b \b")
             }
           }
-          cmd = this.cmdStorage[this.storageIndex]
-          this.term.write(cmd)
-          this.storageIndex = this.storageIndex == 0 ? 0 : this.storageIndex - 1
+
+          
+          if(this.storageIndex == this.cmdStorage.length){
+            this.storageIndex = this.storageIndex - 1
+            cmd = this.cmdStorage[this.storageIndex]
+            this.term.write(cmd)
+          }else if(this.storageIndex == 0){
+            cmd = this.cmdStorage[this.storageIndex]
+            this.term.write(cmd)
+          }else{
+            this.storageIndex = this.storageIndex - 1
+            cmd = this.cmdStorage[this.storageIndex]
+            this.term.write(cmd)
+          }
+          console.log("箭头向上:"+this.storageIndex);
+          console.log(this.cmdStorage);
+          /**
+           * 当index = len-1时，
+           * 当index = 0 时，
+           * 其他情况时 
+           */
         }else if(code === 40){
           // 箭头向下代表下一个命令
           if(cmd != ''){
             let len = cmd.length
-            var backspace
             for(var i=0;i<len;++i){
               this.term.write("\b \b")
             }
           }
-          cmd = this.cmdStorage[this.storageIndex]
-          this.term.write(cmd)
-          this.storageIndex = this.storageIndex == this.cmdStorage.length - 1? this.cmdStorage.length - 1 : this.storageIndex + 1
+          if(this.storageIndex == this.cmdStorage.length){
+            cmd = ""
+            this.term.write(cmd)
+          }else if(this.storageIndex == 0){
+            this.storageIndex = this.storageIndex + 1
+            cmd = this.cmdStorage[this.storageIndex]
+            this.term.write(cmd)
+          }else if(this.storageIndex == this.cmdStorage.length -1){
+            this.storageIndex = this.storageIndex + 1
+            cmd = ""
+            this.term.write(cmd)
+          }else{
+            this.storageIndex = this.storageIndex + 1
+            cmd = this.cmdStorage[this.storageIndex]
+            this.term.write(cmd)
+          }
+
         }else if(code === 27){
 
         }else{

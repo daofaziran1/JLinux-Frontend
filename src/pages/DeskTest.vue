@@ -122,7 +122,6 @@ import TestTerm from '../components/TestTerm.vue'
 
             thisConsole.style.zIndex = this.zIndexMax > childrenCount ? this.zIndexMax + 1 : childrenCount
             this.zIndexMax = parseInt(thisConsole.style.zIndex)
-            console.log()
             // this.$refs.main.$el.children[heightIndex-1].style.zIndex = heightIndex + 1
             // this.$refs.main.$el.children[heightIndex-1].style.left = (280 + (heightIndex-1) * 76.58)+'px'
             // this.$refs.main.$el.children[heightIndex-1].style.top= (49 + (heightIndex-1) * 32)+'px'
