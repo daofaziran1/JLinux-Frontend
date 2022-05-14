@@ -1,5 +1,17 @@
 <template>
-  <div ref="console" class="term"></div>
+  <div ref="console" class="term">
+     <el-upload v-show="false"
+                class="upload-demo"
+                ref="upload"
+                action="api/upload"
+                :file-list="fileList"
+                :on-change="handleChange"
+                :on-success="uploadSuccess"
+                :data="fileInfo"
+                :auto-upload="true">
+            <el-button slot="trigger" size="small" type="primary" ref="select" v-show="false">选取文件</el-button>
+      </el-upload>
+  </div>
 </template>
 
 <script>
@@ -13,6 +25,12 @@ import Vue from 'vue';
     name:"Term",
     data() {
       return {
+        fileList: [],
+        fileInfo:{
+            time:new Date().getTime(),
+            token:'',
+            command: '',
+        },
         userInfo: {
           user: "",
           path: "",
@@ -221,7 +239,7 @@ import Vue from 'vue';
             },
             {
               "cmd": "touch",
-              "format": " touch [-cm][-d<日期时间>][-r<参考文件或目录>] [文件或目录…]",
+              "format": "touch [-cm][-d<日期时间>][-r<参考文件或目录>] [文件或目录…]",
               "params": [
                 "-m 改变档案的修改时间记录。",
                 "-c 假如目的档案不存在，不会建立新的档案",
@@ -235,10 +253,24 @@ import Vue from 'vue';
         cmdStorage:[],
         storageIndex:0,
         term:Object,
-        fitAddon:Object
+        fitAddon:Object,
+        cmd:'',
       };
     },
     methods:{
+      // 上传文件时前的操作
+      handleChange(file, fileList){
+        console.log(file,fileList)
+        this.fileInfo.time = new Date().getTime()
+        this.fileInfo.token = this.userInfo.token
+        this.fileInfo.command = 'rz'
+      },
+      // 上传成功后的操作
+      uploadSuccess(response, file, fileList){
+        this.term.writeln(this.textColor.brightYellow+"文件上传成功")
+        this.cmd = "";
+        this.term.write(this.strHandle(this.textColor.brightWhite+this.userInfo.user,this.userInfo.path))
+      },
       //处理字符的输入，如控制台常有的root@path:$
       strHandle() {
           return arguments.length == 2 ? arguments[0] + '@' + arguments[1] + ':$ ' : arguments[0] + '\n'
@@ -248,6 +280,7 @@ import Vue from 'vue';
             username: "root",
             password: "123456",
           }).then((res) => {
+            console.log(res);
             //  获取后台数据
             this.userInfo.user = "root",
             this.userInfo.path = res.data.path,
@@ -262,7 +295,7 @@ import Vue from 'vue';
       },
       exec() {
         // 记录命令
-        var cmd = ""
+        this.cmd = ""
         // 监听键盘输入事件
         this.term.onKey((e) => {
         /*
@@ -277,8 +310,8 @@ import Vue from 'vue';
         if (code === 13) {
           this.term.write(this.strHandle(e.key))
           //  去除左方空格
-          this.cmdStorage.push(cmd)
-          let cmds = cmd.split(' ')
+          this.cmdStorage.push(this.cmd)
+          let cmds = this.cmd.split(' ')
           if(cmds[0] == ''){
             this.term.write(this.strHandle(this.textColor.brightWhite+this.userInfo.user,this.userInfo.path))
           }else if(cmds[0] == 'help'){
@@ -348,7 +381,7 @@ import Vue from 'vue';
                     }
                   )
               }
-              cmd = "";
+              this.cmd = "";
               this.term.write(this.strHandle(this.textColor.brightWhite+this.userInfo.user,this.userInfo.path))
                
           // clear命令
@@ -361,7 +394,7 @@ import Vue from 'vue';
             }
             // 输出新的一行
             this.term.write(this.strHandle(this.textColor.brightWhite+this.userInfo.user,this.userInfo.path))
-            cmd = ""
+            this.cmd = ""
           // 测试selectAll()方法
           }else if(cmds[0] == 'select'){
             this.term.selectAll()
@@ -370,24 +403,76 @@ import Vue from 'vue';
               return res.length != 0
             })
             console.log(strList);
+          }else if(cmds[0] == 'rz'){
+            console.log("rz要被执行");
+            this.$refs.select.$el.click()
+          }else if(cmds[0] == 'sz'){
+            if(cmds.length == 1){
+              this.term.writeln(this.textColor.red+"命令输入错误")
+              // 输出新的一行
+              this.term.write(this.strHandle(this.textColor.brightWhite+this.userInfo.user,this.userInfo.path))
+              this.cmd = ""
+            }else {
+              let file = new File([],cmds[1])
+              var formData = new FormData();
+                formData.append("file",file,file.name)
+                formData.append("token",this.userInfo.token)
+                formData.append("time",new Date().getTime())
+                formData.append("command",this.cmd)
+                
+                axios({
+                  url:'api/upload',
+                  method: 'post',
+                  headers: {
+                      'Content-Type': 'multipart/form-data'
+                  },
+                  data:formData
+                }).then(
+                  res => {
+                    if(res.data.msg){
+                      var arrayBuffer = new Uint8Array(res.data.bytS).buffer
+                      const blob = new Blob([arrayBuffer])
+                      const URL = window.URL
+                      const href = URL.createObjectURL(blob)
+                      const a = document.createElement('a')
+                      a.href = href
+                      a.download = res.data.name
+                      document.body.appendChild(a)
+                      a.click() //触发点击事件执行下载
+                      a.style.display = 'none'
+                      
+                      const timer = setTimeout(function () {
+                        a.remove() // document.body.removeChild(a)
+                        // 释放blob对象
+                        URL.revokeObjectURL(href)
+                        clearTimeout(timer)
+                      }, 1000)
+                      this.term.writeln(this.textColor.green+"文件"+res.data.name+"下载完成。")
+                      // 输出新的一行
+                      this.term.write(this.strHandle(this.textColor.brightWhite+this.userInfo.user,this.userInfo.path))
+                      this.cmd = ""
+                    }
+                  }
+                )
+            }
           }else{
             axios
               .post("api/exec", {
                 token: this.userInfo.token,
-                command: cmd,
-                time: new Date().getMilliseconds(),
+                command: this.cmd,
+                time: new Date().getTime(),
               })
               .then((res) => {
                 console.log(res);
-                let command = cmd.split(" ")[0]
+                let command = this.cmd.split(" ")[0]
                 
                 if (command === "pwd") {
                   this.term.write('\x1b[1;33m'+this.strHandle(res.data.res[0]))
                 } else if (command === "ls") {
                   // 遍历文件
-                  var hasParams = cmd.split(" ").length == 1 // ls 无参数时为true
+                  var hasParams = this.cmd.split(" ").length == 1 // ls 无参数时为true
+                  console.log(res.data.res);
                   res.data.res.forEach((item) => {
-                    if(!item.match(":")){
                       // 文本文件为绿色
                       var color = this.textColor.green
                       if(item.slice(0,1) == "d"){
@@ -399,7 +484,6 @@ import Vue from 'vue';
                       }else{
                         this.term.writeln(color + item)
                       }
-                    }
                   })
                   if(hasParams) this.term.write("\n")
                 } else if (command === "cd") {
@@ -416,6 +500,7 @@ import Vue from 'vue';
                   if(res.data.msg){
                     res.data.res.forEach(v => {
                       this.term.writeln('\t'+this.textColor.brightMagenta + v)
+                      
                     })
                   }
                 }else if(command === 'cat'){
@@ -429,28 +514,28 @@ import Vue from 'vue';
                     this.term.writeln(v)
                   })
                 }
-                cmd = "";
+                this.cmd = "";
                 this.term.write(this.strHandle(this.textColor.brightWhite+this.userInfo.user,this.userInfo.path))
               }).catch(
                 error => {
                   this.term.writeln(this.textColor.red+"命令输入错误")
-                  cmd = "";
+                  this.cmd = "";
                   this.term.write(this.strHandle(this.textColor.brightWhite+this.userInfo.user,this.userInfo.path))
                 }
               )
           }
           this.storageIndex = this.cmdStorage.length
         } else if (code === 8) {
-            if(cmd.length !== 0){
+            if(this.cmd.length !== 0){
               this.term.write("\b \b")
-              cmd = cmd.substring(0, cmd.length - 1)
+              this.cmd = this.cmd.substring(0, this.cmd.length - 1)
             }
         } else if(code === 9){
           // 代码提示
           let arr = []
           this.commandList.forEach(
             v => {
-                if(v.cmd.match(cmd) != null){
+                if(v.cmd.match(this.cmd) != null){
                   arr.push(v.cmd)
                 }
             }
@@ -465,13 +550,13 @@ import Vue from 'vue';
                 this.term.write('\n')
               }
           }
-          cmd = "";
+          this.cmd = "";
           this.term.write(this.strHandle(this.textColor.brightWhite+this.userInfo.user,this.userInfo.path))
         }else if(code === 38){
 
           // 箭头向上代表上一个命令
-          if(cmd != ''){
-            let len = cmd.length
+          if(this.cmd != ''){
+            let len = this.cmd.length
             for(var i=0;i<len;++i){
               this.term.write("\b \b")
             }
@@ -480,15 +565,15 @@ import Vue from 'vue';
           
           if(this.storageIndex == this.cmdStorage.length){
             this.storageIndex = this.storageIndex - 1
-            cmd = this.cmdStorage[this.storageIndex]
-            this.term.write(cmd)
+            this.cmd = this.cmdStorage[this.storageIndex]
+            this.term.write(this.cmd)
           }else if(this.storageIndex == 0){
-            cmd = this.cmdStorage[this.storageIndex]
-            this.term.write(cmd)
+            this.cmd = this.cmdStorage[this.storageIndex]
+            this.term.write(this.cmd)
           }else{
             this.storageIndex = this.storageIndex - 1
-            cmd = this.cmdStorage[this.storageIndex]
-            this.term.write(cmd)
+            this.cmd = this.cmdStorage[this.storageIndex]
+            this.term.write(this.cmd)
           }
           console.log("箭头向上:"+this.storageIndex);
           console.log(this.cmdStorage);
@@ -499,35 +584,35 @@ import Vue from 'vue';
            */
         }else if(code === 40){
           // 箭头向下代表下一个命令
-          if(cmd != ''){
-            let len = cmd.length
+          if(this.cmd != ''){
+            let len = this.cmd.length
             for(var i=0;i<len;++i){
               this.term.write("\b \b")
             }
           }
           if(this.storageIndex == this.cmdStorage.length){
-            cmd = ""
-            this.term.write(cmd)
+            this.cmd = ""
+            this.term.write(this.cmd)
           }else if(this.storageIndex == 0){
             this.storageIndex = this.storageIndex + 1
-            cmd = this.cmdStorage[this.storageIndex]
-            this.term.write(cmd)
+            this.cmd = this.cmdStorage[this.storageIndex]
+            this.term.write(this.cmd)
           }else if(this.storageIndex == this.cmdStorage.length -1){
             this.storageIndex = this.storageIndex + 1
-            cmd = ""
-            this.term.write(cmd)
+            this.cmd = ""
+            this.term.write(this.cmd)
           }else{
             this.storageIndex = this.storageIndex + 1
-            cmd = this.cmdStorage[this.storageIndex]
-            this.term.write(cmd)
+            this.cmd = this.cmdStorage[this.storageIndex]
+            this.term.write(this.cmd)
           }
 
         }else if(code === 27){
 
         }else{
-          cmd = cmd + e.key
+          this.cmd = this.cmd + e.key
           this.term.write(e.key)
-          console.log(cmd);
+          console.log(this.cmd);
         }
       });
       }
@@ -543,8 +628,12 @@ import Vue from 'vue';
             cursorStyle: "underline", //光标样式
             cursorBlink: true, //光标闪烁
             windowsMode: false,
+            // fontFamily: "Georgia", 字体样式
+            // fontFamily: "Times New Roman", //字体样式,
+            // fontFamily:"Droid Sans Mono",
+            // fontSize:15,
             theme: {
-              foreground: "rgb(255, 255, 255)", //字体
+              foreground: "rgb(255, 255, 255)", //字体，
               background: "#222222", //背景色
               cursor: "help", //设置光标
               lineHeight: 16,

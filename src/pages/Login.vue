@@ -16,7 +16,7 @@
                             <span>记住密码 </span>
                             <el-switch v-model="form.record"></el-switch>
                         </div>
-                        <el-link class="pos">忘记密码？</el-link>
+                        <!-- <el-link class="pos">忘记密码？</el-link> -->
                     </div>
                     <el-button type="primary" :plain="true" @click="onSubmit" round>登录</el-button>
                 </el-form>

@@ -1,7 +1,12 @@
 {
     "cSpell.words": [
+        "appsecret",
         "axios",
         "cmds",
+        "echarts",
+        "exel",
+        "isshowtoday",
+        "touchthreshold",
         "vuex"
     ]
 }

@@ -40,6 +40,7 @@
             bubbling(e) {
                 // console.log(e.target.src)
                 this.$emit('getTheme', e.target.src)
+                localStorage.setItem('bgImg',e.target.src)
                 // console.log(e)
                 // var bg = e.target.parentElement
                 // console.log(bg.style.backgroundColor)

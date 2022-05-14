@@ -4,17 +4,56 @@ backgroundSize:['100%','100%']}">
         <el-container>
             <el-header :height="headerHeight">
                 <span style="float:left;">活动</span>
-                <span>{{dateTime}}</span>
+               
+                <div class="weather-date">
+                  <!--时间、日历实现 -->
+                    <el-popover
+                      placement="bottom"
+                      width="400"
+                      trigger="click">
+                      <!-- <H5Calendar lunar :touchthreshold="50"/> -->
+                       <H5Calendar
+                          lunar
+                          :touchthreshold="50"
+                          isshowtoday
+                        />
+                      <span class="weather-font"  slot="reference">{{dateTime}}</span>
+                    </el-popover>
+                   <!-- <div style="width:10rem"></div> -->
+                   <!-- <el-divider direction="vertical"></el-divider> -->
+                   <!--  单日天气 、七日天气-->
+                      <el-popover
+                        placement="bottom"
+                        width="480"
+                        trigger="click">
+                        <Weather></Weather>
+                        <div slot="reference" class="weather-state">
+                          <span>{{weather.city}}</span>
+                          <el-divider direction="vertical"></el-divider>
+                          <el-image :src="WeatherImg" fit="scale-down" class="weather-img"></el-image>
+                          <span class="weather-font">
+                              {{weather.wea}}
+                          </span>
+                          <el-divider direction="vertical"></el-divider>
+                          <span class="weather-font">今日气温：{{weather.tem_night+'°'+' ~ '+weather.tem_day+'°'}}</span>
+                      </div>
+                    </el-popover>
+
+
+                </div>
+
                 <span class="mouse"  @click="dialogVisible = true" circle><i class="el-icon-edit"></i></span>
             </el-header>
             <el-container>
                 <el-aside :width="asideWidth">
                   <Software @dblclick.native="createTermView"></Software>
                   <FileSoft @dblclick.native="openFile"></FileSoft>
+                  <SystemShow @dblclick.native="openSystemShow"></SystemShow>
                 </el-aside>
                 <el-container>
                     <el-main ref="main" id="test">
                       <File v-if="fileShow"></File>
+                      <SystemState v-if="isSystemShow"></SystemState>
                       <!-- <test-term></test-term> -->
                       <!-- <console-window></console-window>     -->
                       <el-dialog
@@ -27,9 +66,6 @@ backgroundSize:['100%','100%']}">
                             <Theme  @getTheme="getImg"></Theme>
                       </el-dialog>
                     </el-main>
-                    <!-- <el-footer :height="footerHeight">
-                        <Tab></Tab> 
-                    </el-footer> -->
                 </el-container>
             </el-container>
         </el-container>
@@ -47,6 +83,10 @@ import Vue from 'vue'
 import FileSoft from '../components/FileSoft.vue'
 import File from '../components/File.vue'
 import TestTerm from '../components/TestTerm.vue'
+import Weather from '../components/Weather.vue'
+import H5Calendar from "vue-calendar-h5";
+import SystemShow from '../components/SystemShow.vue'
+import SystemState from '../components/SystemState.vue'
     export default {
         name:'DeskTest',
         data(){
@@ -59,8 +99,11 @@ import TestTerm from '../components/TestTerm.vue'
             dialogVisible: false,
             bgImg:require('../assets/desktop.png'),
             fileShow:false,
-            
-            zIndexMax:1  //  设置一个图层属性，最低是1
+            isSystemShow:false,
+            weather:{},
+            WeatherImg:'',
+            zIndexMax:1,  //  设置一个图层属性，最低是1，
+            gridData:[]
           }
         },
         // computed: {
@@ -71,7 +114,7 @@ import TestTerm from '../components/TestTerm.vue'
         //         return Vue.state.tabShow
         //     }
         // },
-        components:{Software,ConsoleWindow,Tab,Theme,FileSoft, File, TestTerm},
+        components:{Software,ConsoleWindow,Tab,Theme,FileSoft, File, TestTerm, Weather,H5Calendar, SystemShow,SystemState},
         created() {
           
           
@@ -144,6 +187,18 @@ import TestTerm from '../components/TestTerm.vue'
           },
           openFile(){
             this.fileShow = !this.fileShow
+          },
+          openSystemShow(){
+            this.isSystemShow = !this.isSystemShow
+          },
+          getWeatherImg(weather){
+                let imgSrc = weather.wea_img
+                if(weather.wea_img == 'qing' || weather.wea_img == 'yun'){
+                    if(parseInt(dayjs().format('HH'))  > 18){
+                        imgSrc+='night'
+                    }
+                }
+                this.WeatherImg = require('../assets/'+imgSrc+'.png')
           }
         },
         mounted() {
@@ -151,7 +206,20 @@ import TestTerm from '../components/TestTerm.vue'
           this.timer = setInterval(() => {
               this.dateTime = dayjs().format("YYYY年MM月DD日 dddd HH:mm:ss")
           },144)
-          
+          if(localStorage.getItem('bgImg') != null){
+            this.bgImg = localStorage.getItem('bgImg')
+          }
+          // 请求天气接口
+          this.$axios.get('https://yiketianqi.com/free/day',{
+                params:{
+                    appid:'34962419',
+                    appsecret:'GhNEd877',
+                    vue:'1'
+                }
+            }).then(res => {
+                this.weather = res.data
+                this.getWeatherImg(this.weather)
+            })
         },
         updated(){
             
@@ -216,7 +284,8 @@ import TestTerm from '../components/TestTerm.vue'
     align-items: center;
   }
   span{
-    font-size: larger;
+    font-size: 1.5rem;
+    /* font-size: larger; */
   }
   .mouse{
 
@@ -225,5 +294,22 @@ import TestTerm from '../components/TestTerm.vue'
   }
   .mouse:hover{
     background-color: #333;
+  }
+  .weather-font{
+      font-size: 1.5rem;
+  }
+  .weather-state{
+      display: flex;
+      align-items: center;
+      margin-left: 10rem;
+  }
+  .weather-date{
+      display: flex;
+      align-items: center;
+      
+  }
+  .weather-img{
+      width: 24px;
+      height: 24px;
   }
 </style>
