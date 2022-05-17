@@ -11,13 +11,32 @@ const mutations = {
         state.termShow = !state.termShow
     },
     changeTabShow(state){
-        state.termShow = !state.tabShow
+        state.tabShow = !state.tabShow
+    },
+    getUserInfo(state){
+        return state.userInfo
+    },
+    setUserInfo(state,newInfo){
+        state.userInfo = newInfo
     }
 }
 
 const state = {
     termShow: false,
-    tabShow: false
+    tabShow: false,
+    userInfo:{
+        user:'',
+        path:'',
+        token:''
+    },
+    Terms:[
+        {
+            termShow: false,
+            tabShow: false,
+            time:1648971213140,
+            
+        }
+    ]
 }
 
 const store = new Vuex.Store({

@@ -1,5 +1,17 @@
 <template>
-  <div ref="console" class="term"></div>
+  <div ref="console" class="term">
+     <el-upload v-show="false"
+                class="upload-demo"
+                ref="upload"
+                action="api/upload"
+                :file-list="fileList"
+                :on-change="handleChange"
+                :on-success="uploadSuccess"
+                :data="fileInfo"
+                :auto-upload="true">
+            <el-button slot="trigger" size="small" type="primary" ref="select" v-show="false">选取文件</el-button>
+      </el-upload>
+  </div>
 </template>
 
 <script>
@@ -67,10 +79,12 @@ export default {
       this.term.onKey((e) => {
         //console.log(e);
         /*
-                  esc = 27
-                  回车 = 13
-                  上下左右 = 37,38,39,40
-                  backspace = 8
+          esc = 27
+          回车 = 13
+          上下左右 = 37,38,39,40
+          backspace = 8
+          向上箭头  38
+          向下箭头  40
         */
         let code = e.domEvent.which;
         if (code === 13) {
@@ -136,4 +150,9 @@ export default {
 </script>
 
 <style>
+  .test{
+    background-color: rgb(255, 255, 255);
+    background-color: #222222;
+  }
 </style>
+

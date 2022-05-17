@@ -16,7 +16,7 @@
                             <span>记住密码 </span>
                             <el-switch v-model="form.record"></el-switch>
                         </div>
-                        <el-link class="pos">忘记密码？</el-link>
+                        <!-- <el-link class="pos">忘记密码？</el-link> -->
                     </div>
                     <el-button type="primary" :plain="true" @click="onSubmit" round>登录</el-button>
                 </el-form>
@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import axios from 'axios';
     export default {
         name:'Login',
         data() {
@@ -39,7 +40,6 @@
         },
         methods: {
             onSubmit() {
-                console.log(this.$store.state)
                 if(this.form.account.length === 0 || this.form.password.length === 0){
                     this.$message.error('账号密码不能为空，请输入账号密码，再点击登录。');
                 }else{
@@ -53,8 +53,19 @@
                             record: false,
                         }))
                     }
+                    var user = this.form.account
                     // 与后端进行密码验证，并返回用户信息
-
+                    axios.post('api/login',{
+                        username: this.form.account,
+                        password: this.form.password
+                    }).then(res => {
+                        var userInfo = {
+                            user:user,
+                            path:res.data.path,
+                            token:res.data.token
+                        }
+                        this.$store.commit('setUserInfo',userInfo)
+                    })
                     // 页面跳转
                     this.$router.push({
                         name:'Desktop'
@@ -71,7 +82,7 @@
         mounted() {
             // 先判断本地缓存里是否有用户信息，若有，则直接绑定到用户密码上。
             if(localStorage.length !=0){
-                if(localStorage.getItem('userInfo') != null){
+                if(localStorage.getItem('userInfo') !== null){
                     this.form = JSON.parse(localStorage.getItem('userInfo'))
                 }else {
                     this.form = {

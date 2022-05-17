@@ -1,5 +1,5 @@
 <template>
-    <button :style="tabHeight" v-show="tabShow">
+    <button :style="tabHeight" v-show="tabShow" @click="changeTermShow">
         {{info}}
     </button>
 </template>
@@ -18,14 +18,16 @@
         },
         computed: {
             termShow() {
-                return this.state.termShow
+                return this.$store.state.termShow
             },
             tabShow() {
-                return this.$store.state.termShow
+                return this.$store.state.tabShow
             }
         },
         methods:{
-
+            changeTermShow() {
+                this.$store.commit('changeTermShow')
+            }
         }
     }
 </script>

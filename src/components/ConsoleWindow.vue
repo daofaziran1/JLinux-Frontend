@@ -1,6 +1,6 @@
 <template>
   <div class ="console" v-show="isShow" >
-    <div class="menu" @mousedown="move">
+    <div class="menu" @mousedown="move" @click="bubbleLayer">
         <div class="consoleNum">
             <span class="num">{{info}}</span>
         </div>
@@ -13,6 +13,7 @@
   </div>
 </template>
 <script>
+import Vue from 'vue'
 import Term from "./Term"
     export default {
         name:'ConsoleWindow',
@@ -25,7 +26,7 @@ import Term from "./Term"
                 */  
                 info:"console-1",
                 // isShow:this.$store.state.termShow,
-                tabShow:this.$store.state.tabShow,
+                // tabShow:this.$store.state.tabShow,
                 posX:0,
                 posY:0
             }
@@ -40,7 +41,6 @@ import Term from "./Term"
                 this.$store.commit('changeTermShow')
             },
             close(){
-                this.changeShow()
                 this.$store.commit('changeTabShow')
                 // 销毁这个控制台的使用，使用生命周期钩子销毁函数，但有bug
                 // this.$destroy()
@@ -48,14 +48,14 @@ import Term from "./Term"
             move(e){
                 let odiv = e.target;        //获取目标元素
                 let odivPre = e.target.parentElement                // 找到父元素
-                console.log(e.target === e.currentTarget);
                 // 找到父元素
-                console.log(e.target.parentElement)
+                // console.log(e.target.parentElement)
                 //算出鼠标相对元素的位置
                 let disX = e.clientX - odiv.offsetLeft;
                 let disY = e.clientY - odiv.offsetTop;
 
                 document.onmousemove = (e)=>{       //鼠标按下并移动的事件
+                
                     //用鼠标的位置减去鼠标相对元素的位置，得到元素的位置
                     let left = e.clientX - disX;    
                     let top = e.clientY - disY;
@@ -64,7 +64,7 @@ import Term from "./Term"
                     this.posX = top;
                     this.posY = left;
                     
-                    //移动当前元素
+                    //移动当前父元素
                     odivPre.style.left = left + 'px';
                     odivPre.style.top = top + 'px';
                 };
@@ -72,7 +72,12 @@ import Term from "./Term"
                     document.onmousemove = null;
                     document.onmouseup = null;
                 };
+            },
+            bubbleLayer(e){
+
             }    
+        },
+        created(){
         },
         components:{Term},
         beforeDestroy(){
