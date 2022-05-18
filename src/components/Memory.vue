@@ -134,7 +134,7 @@ export default {
             this.$axios.post('api/exec',{
                 token: this.userInfo.token,
                 command: "Mem",
-                time: new Date().getMilliseconds(),
+                time: new Date().getTime(),
             }).then(
                 res => {
                     let memory = res.data.res

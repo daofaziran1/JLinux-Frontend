@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="main">
     <!-- <ConsoleWindow></ConsoleWindow> -->
     <!-- <Desktop></Desktop> -->
     <router-view>      
@@ -19,4 +19,9 @@ import DeskTest from './pages/DeskTest'
   };
 </script>
 <style scoped>
+#main{
+    height: 100%;
+    width:100%;
+    /* background-image: url('../assets/desktop.png'); */
+  }
 </style>

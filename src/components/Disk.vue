@@ -57,7 +57,7 @@ export default {
             this.$axios.post('api/exec',{
                 token: this.userInfo.token,
                 command: "systemFile",
-                time: new Date().getMilliseconds(),
+                time: new Date().getTime(),
             }).then(
                 res => {
                     let arr = res.data.res

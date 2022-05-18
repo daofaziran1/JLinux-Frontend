@@ -62,7 +62,7 @@ export default {
             this.$axios.post('api/exec',{
                 token: this.userInfo.token,
                 command: "cpu",
-                time: new Date().getMilliseconds(),
+                time: new Date().getTime(),
             }).then(
                 res => {
                     this.cpu = res.data.res

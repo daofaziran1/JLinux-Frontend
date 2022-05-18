@@ -233,8 +233,8 @@ import SystemState from '../components/SystemState.vue'
 
 <style scoped>
   #deskBasic{
-    height: 722px;
-    width:1536px;
+    height: 100%;
+    width:100%;
     /* background-image: url('../assets/desktop.png'); */
   }
   .el-container{

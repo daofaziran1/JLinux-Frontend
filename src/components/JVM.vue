@@ -68,7 +68,7 @@ export default {
             this.$axios.post('api/exec',{
                 token: this.userInfo.token,
                 command: "jvm",
-                time: new Date().getMilliseconds(),
+                time: new Date().getTime(),
             }).then(
                 res => {
                     let jdk = res.data.res

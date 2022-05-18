@@ -169,7 +169,7 @@ import Vue from 'vue';
                 this.$axios.post('api/exec',{
                     token: this.userInfo.token,
                     command: 'cd '+fileName,
-                    time: new Date().getMilliseconds(),
+                    time: new Date().getTime(),
                 }).then(
                     res => {
 
@@ -201,7 +201,7 @@ import Vue from 'vue';
                 this.$axios.post('api/exec',{
                     token: this.userInfo.token,
                     command: cmd,
-                    time: new Date().getMilliseconds(),
+                    time: new Date().getTime(),
                 }).then(
                     res => {
                         if(res.data.msg){
@@ -235,7 +235,7 @@ import Vue from 'vue';
                 this.$axios.post('api/exec',{
                     token: this.userInfo.token,
                     command: cmd,
-                    time: new Date().getMilliseconds(),
+                    time: new Date().getTime(),
                 }).then(
                     res => {
                         if(res.data.msg){
@@ -253,7 +253,7 @@ import Vue from 'vue';
                     this.$axios.post('api/exec',{
                         token: this.userInfo.token,
                         command: cmd,
-                        time: new Date().getMilliseconds(),
+                        time: new Date().getTime(),
                     }).then(
                         res => {
                             if(res.data.msg){
@@ -272,7 +272,7 @@ import Vue from 'vue';
                 this.$axios.post('api/exec',{
                     token: this.userInfo.token,
                     command: cmd,
-                    time: new Date().getMilliseconds(),
+                    time: new Date().getTime(),
                 }).then(
                     res => {
                         if(res.data.status){
@@ -297,7 +297,7 @@ import Vue from 'vue';
                 this.$axios.post('api/exec',{
                     token: this.userInfo.token,
                     command: "ls",
-                    time: new Date().getMilliseconds(),
+                    time: new Date().getTime(),
                 }).then(
                     res => {
                         let list = res.data.res

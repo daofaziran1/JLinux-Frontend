@@ -513,6 +513,18 @@ import Vue from 'vue';
                   res.data.res.forEach( v =>{
                     this.term.writeln(v)
                   })
+                }else if(command === 'mailr'){
+                  console.log(res.data)
+                  if(res.data.type === 'list'){
+                    res.data.data.forEach( v =>{
+                      let data=JSON.parse(v)
+                      this.term.writeln(data.mid +"  "+data.subject)
+                    })
+                  }else{
+                    let data=JSON.parse(res.data.data)
+                    this.term.writeln(data.subject)
+                    this.term.writeln(data.content)
+                  }
                 }
                 this.cmd = "";
                 this.term.write(this.strHandle(this.textColor.brightWhite+this.userInfo.user,this.userInfo.path))
