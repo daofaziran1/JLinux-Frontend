@@ -68,7 +68,11 @@ import axios from 'axios';
                     })
                     // 页面跳转
                     this.$router.push({
-                        name:'Desktop'
+                        name:'Desktop',
+                        params:{
+                            username:this.form.account,
+                            password:this.form.password
+                        }
                     })
                     // 并将输入框内恢复成默认状态
                     this.form ={

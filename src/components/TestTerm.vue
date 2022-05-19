@@ -8,13 +8,17 @@
             <span class="tab"  @click="close">X</span>
         </div>
     </div> 
-    <Term></Term>
+    <Term v-bind:username="username" v-bind:password="password" ></Term>
   </div>
 </template>
 <script>
 import Term from "./Term"
     export default {
         name:'TestTerm',
+        props:{
+            username:String,
+            password:String,
+        },
         data() {
             return {
                 /*
